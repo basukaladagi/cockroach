@@ -19,6 +19,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/cockroachdb/cockroach/util/stop"
 )
@@ -27,17 +28,20 @@ func main() {
 	stopper := stop.NewStopper()
 	defer stopper.Stop()
 
-	c := createCluster(stopper, 5)
+	// TODO(bram): Setup flags to allow filenames for these outputs. Print both
+	// to action and epoch to os.Stdout as well.
+	epochWriter := os.Stdout
+	actionWriter := os.Stdout
+
+	c := createCluster(stopper, 5, epochWriter, actionWriter)
 
 	fmt.Printf("A simulation of the cluster's rebalancing.\n\n")
 	fmt.Println(c)
 
 	// Split a random range 100 times.
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 10; i++ {
 		c.splitRangeRandom()
 	}
-
-	fmt.Println(c.StringEpochHeader())
 
 	for i := 0; i < 100; i++ {
 		c.runEpoch()
